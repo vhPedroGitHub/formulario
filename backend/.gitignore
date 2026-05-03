@@ -1,0 +1,7 @@
+# Archivos generados
+__pycache__/
+*.pyc
+*.pyo
+.env
+uploads/
+*.pdf
