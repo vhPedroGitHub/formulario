@@ -78,7 +78,14 @@ export function FormDetailPage() {
         const result = await responsesApi.uploadFile(formId, fieldId, file)
         setAnswers((prev) => ({ ...prev, [fieldId]: result.stored_name }))
       }
-      const payload = { answers: Object.entries(answers).map(([k, v]) => ({ field_id: Number(k), value: v })) }
+      // Only include answers for visible fields
+      const visibleFields = form!.fields.filter((f) => isFieldVisible(f, answers, form!.fields))
+      const visibleIds = new Set(visibleFields.map((f) => f.id))
+      const payload = {
+        answers: Object.entries(answers)
+          .filter(([k]) => visibleIds.has(Number(k)))
+          .map(([k, v]) => ({ field_id: Number(k), value: v })),
+      }
       if (myResponse && form?.is_editable) {
         return responsesApi.updateMine(formId, payload)
       }

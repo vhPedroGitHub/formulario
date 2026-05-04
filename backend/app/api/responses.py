@@ -7,6 +7,36 @@ from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.core.deps import DB, CurrentUser, CurrentAdmin
+
+
+def _is_field_visible(field, fields_by_order: list, answers_map: dict) -> bool:
+    """Return True if field is visible given submitted answers.
+
+    conditional_logic.field_id is the 0-based index into fields_by_order
+    (sorted by field.order), which is how the frontend stores it.
+    """
+    cond = field.conditional_logic
+    if not cond:
+        return True
+    field_index = cond.get("field_id")
+    if field_index is None or field_index >= len(fields_by_order):
+        return True
+    referenced = fields_by_order[field_index]
+    answer = answers_map.get(referenced.id)
+    actual = str(answer.value) if (answer and answer.value is not None) else ""
+    expected = cond.get("value", "")
+    operator = cond.get("operator", "equals")
+    if operator == "equals":
+        if isinstance(expected, list):
+            return actual in [str(v) for v in expected]
+        return actual == str(expected)
+    if operator == "not_equals":
+        if isinstance(expected, list):
+            return actual not in [str(v) for v in expected]
+        return actual != str(expected)
+    if operator == "contains":
+        return str(expected).lower() in actual.lower()
+    return True
 from app.models.form import Form
 from app.models.form_field import FormField, FieldType
 from app.models.form_response import FormResponse
@@ -68,10 +98,12 @@ async def submit_response(form_id: int, body: ResponseCreate, db: DB, current_us
     if existing.scalar_one_or_none():
         raise HTTPException(409, "Ya respondiste este formulario")
 
-    # Validar campos requeridos
-    fields_map = {f.id: f for f in form.fields}
+    # Validar campos requeridos (solo los que son visibles según lógica condicional)
+    fields_by_order = sorted(form.fields, key=lambda f: f.order)
     answers_map = {a.field_id: a for a in body.answers}
     for field in form.fields:
+        if not _is_field_visible(field, fields_by_order, answers_map):
+            continue  # campo oculto por condición → no se valida como requerido
         if field.is_required and field.type != FieldType.file:
             ans = answers_map.get(field.id)
             if not ans or ans.value is None or ans.value == "" or ans.value == []:
@@ -128,6 +160,18 @@ async def update_my_response(form_id: int, body: ResponseCreate, db: DB, current
         raise HTTPException(404, "No encontramos tu respuesta previa")
 
     fields_map = {f.id: f for f in form.fields}
+    fields_by_order = sorted(form.fields, key=lambda f: f.order)
+    answers_map_in = {a.field_id: a for a in body.answers}
+
+    # Validar campos requeridos visibles
+    for field in form.fields:
+        if not _is_field_visible(field, fields_by_order, answers_map_in):
+            continue
+        if field.is_required and field.type != FieldType.file:
+            ans = answers_map_in.get(field.id)
+            if not ans or ans.value is None or ans.value == "" or ans.value == []:
+                raise HTTPException(422, f"El campo '{field.label}' es requerido")
+
     # Eliminar respuestas anteriores y reemplazar
     for ans in response.answers:
         await db.delete(ans)
