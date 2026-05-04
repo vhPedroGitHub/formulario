@@ -126,33 +126,34 @@ export function FormDetailPage() {
       </button>
 
       {/* Header */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 mb-1">{form.title}</h1>
-            {form.description && (
-              <p className="text-sm text-gray-600 whitespace-pre-wrap">{form.description}</p>
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <h1 className="text-xl font-bold text-gray-900 leading-snug">{form.title}</h1>
+            {hasResponded && form.is_editable && !editMode && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditMode(true)}
+                className="shrink-0"
+              >
+                <Edit className="size-4" />
+                Editar
+              </Button>
             )}
-            <div className="flex flex-wrap gap-2 mt-3">
-              {form.is_anonymous && <Badge variant="info">Anónimo</Badge>}
-              {form.is_editable && <Badge variant="warning">Editable</Badge>}
-              {form.end_date && (
-                <Badge variant="default">
-                  Cierra: {format(new Date(form.end_date), 'dd MMM yyyy', { locale: es })}
-                </Badge>
-              )}
-            </div>
           </div>
-          {hasResponded && form.is_editable && !editMode && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditMode(true)}
-            >
-              <Edit className="size-4" />
-              Editar
-            </Button>
+          {form.description && (
+            <p className="text-sm text-gray-600 whitespace-pre-wrap">{form.description}</p>
           )}
+          <div className="flex flex-wrap gap-2">
+            {form.is_anonymous && <Badge variant="info">Anónimo</Badge>}
+            {form.is_editable && <Badge variant="warning">Editable</Badge>}
+            {form.end_date && (
+              <Badge variant="default">
+                Cierra: {format(new Date(form.end_date), 'dd MMM yyyy', { locale: es })}
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
@@ -172,7 +173,7 @@ export function FormDetailPage() {
 
       {/* Form fields */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           {submitError && (
             <Alert variant="error" className="mb-4">
               {submitError}
@@ -193,7 +194,7 @@ export function FormDetailPage() {
               ))}
           </div>
 
-          <div className="flex justify-end gap-3 mt-6 pt-5 border-t">
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-6 pt-5 border-t">
             {editMode && (
               <Button variant="outline" onClick={() => setEditMode(false)}>
                 Cancelar
@@ -212,7 +213,7 @@ export function FormDetailPage() {
 
       {/* View-only filled response */}
       {hasResponded && !editMode && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
             Tu respuesta
           </h2>

@@ -284,7 +284,7 @@ function FormEditor({ initialData, formId }: { initialData?: FormOut; formId?: n
         <ArrowLeft className="size-4" /> Volver
       </button>
 
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
         {isEdit ? 'Editar formulario' : 'Crear formulario'}
       </h1>
 
@@ -302,14 +302,14 @@ function FormEditor({ initialData, formId }: { initialData?: FormOut; formId?: n
       {error && <Alert variant="error" className="mb-4">{error}</Alert>}
 
       {/* General info */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-5">
+      <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-5">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
           Información general
         </h2>
         <div className="flex flex-col gap-4">
           <Input label="Título" value={title} onChange={(e) => setTitle(e.target.value)} required />
           <Textarea label="Descripción (opcional)" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input label="Fecha de inicio (opcional)" type="datetime-local" value={startDate}
               onChange={(e) => setStartDate(e.target.value)} />
             <Input label="Fecha de cierre (opcional)" type="datetime-local" value={endDate}
@@ -331,7 +331,7 @@ function FormEditor({ initialData, formId }: { initialData?: FormOut; formId?: n
       </section>
 
       {/* Audience */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-5">
+      <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
             Audiencia
@@ -369,7 +369,7 @@ function FormEditor({ initialData, formId }: { initialData?: FormOut; formId?: n
       </section>
 
       {/* Fields */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-5">
+      <section className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
             Campos ({fields.length})
@@ -399,7 +399,7 @@ function FormEditor({ initialData, formId }: { initialData?: FormOut; formId?: n
       </section>
 
       {/* Submit */}
-      <div className="flex justify-end gap-3 pb-8">
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pb-8">
         <Button variant="outline" onClick={() => navigate('/admin/forms')}>Cancelar</Button>
         <Button loading={isPending} onClick={handleSubmit} size="lg">
           {isEdit ? 'Guardar cambios' : 'Crear formulario'}
@@ -437,7 +437,7 @@ function AudienceSelector({ sel, faculties, allCareers, specialRoles, users, onC
 
   return (
     <div className="flex gap-2 items-start p-3 rounded-lg bg-gray-50 border border-gray-100">
-      <div className="flex-1 grid grid-cols-2 gap-2">
+      <div className="flex-1 flex flex-col gap-2">
         <Select
           value={sel.type}
           onChange={(e) => onChange({ type: e.target.value as AudienceTargetType, facultyId: undefined, careerId: undefined, groupId: undefined, userId: undefined, roleId: undefined })}
@@ -518,20 +518,20 @@ function FieldEditor({
     <div className="border border-gray-200 rounded-xl overflow-hidden">
       {/* Header */}
       <div
-        className="flex items-center gap-3 px-4 py-3 bg-gray-50 cursor-pointer"
+        className="flex items-center gap-2 px-3 py-3 bg-gray-50 cursor-pointer"
         onClick={() => setExpanded(!expanded)}
       >
-        <GripVertical className="size-4 text-gray-300" />
+        <GripVertical className="size-4 text-gray-300 shrink-0" />
         <div className="flex-1 min-w-0">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-700 block truncate">
             {index + 1}. {field.label || 'Sin título'}
           </span>
-          <div className="flex gap-2 mt-0.5">
+          <div className="flex gap-2 mt-0.5 flex-wrap">
             <Badge variant="default" className="text-xs">{field.type}</Badge>
             {field.is_required && <Badge variant="danger" className="text-xs">Requerido</Badge>}
           </div>
         </div>
-        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+        <div className="flex gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
           <button onClick={onMoveUp} disabled={!onMoveUp} className="p-1 rounded hover:bg-gray-200 disabled:opacity-30">
             <ChevronUp className="size-4 text-gray-500" />
           </button>
@@ -542,12 +542,12 @@ function FieldEditor({
             <Trash2 className="size-4 text-red-400" />
           </button>
         </div>
-        {expanded ? <ChevronUp className="size-4 text-gray-400" /> : <ChevronDown className="size-4 text-gray-400" />}
+        {expanded ? <ChevronUp className="size-4 text-gray-400 shrink-0" /> : <ChevronDown className="size-4 text-gray-400 shrink-0" />}
       </div>
 
       {expanded && (
         <div className="p-4 flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input label="Etiqueta" value={field.label} onChange={(e) => onChange({ label: e.target.value })} required />
             <Select label="Tipo" value={field.type}
               onChange={(e) => onChange({ type: e.target.value as FieldType, options: [] })}
@@ -625,20 +625,22 @@ function ConditionalLogicEditor({
         <span className="text-sm text-gray-700">Mostrar condicionalmente</span>
       </label>
       {enabled && (
-        <div className="flex gap-2 p-3 bg-blue-50 rounded-lg">
-          <span className="text-xs text-blue-700 font-medium pt-2">Mostrar si</span>
-          <Select value={String(field.conditional_logic?.field_id ?? '')}
-            onChange={(e) => onChange({ conditional_logic: { ...(field.conditional_logic ?? { operator: 'equals', value: '' }), field_id: Number(e.target.value) } })}
-            options={prevFields.map((f) => ({ value: allFields.indexOf(f), label: f.label || `Campo ${allFields.indexOf(f) + 1}` }))}
-            placeholder="Campo..." label="" />
-          <Select value={field.conditional_logic?.operator ?? 'equals'}
-            onChange={(e) => onChange({ conditional_logic: { ...(field.conditional_logic ?? { field_id: 0, value: '' }), operator: e.target.value as 'equals' | 'not_equals' | 'contains' } })}
-            options={[{ value: 'equals', label: 'es igual a' }, { value: 'not_equals', label: 'no es igual a' }, { value: 'contains', label: 'contiene' }]}
-            label="" />
-          <input type="text" placeholder="Valor..."
-            value={String(field.conditional_logic?.value ?? '')}
-            onChange={(e) => onChange({ conditional_logic: { ...(field.conditional_logic ?? { field_id: 0, operator: 'equals' as const }), value: e.target.value } })}
-            className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500" />
+        <div className="flex flex-col gap-2 p-3 bg-blue-50 rounded-lg">
+          <span className="text-xs text-blue-700 font-medium">Mostrar si:</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <Select value={String(field.conditional_logic?.field_id ?? '')}
+              onChange={(e) => onChange({ conditional_logic: { ...(field.conditional_logic ?? { operator: 'equals', value: '' }), field_id: Number(e.target.value) } })}
+              options={prevFields.map((f) => ({ value: allFields.indexOf(f), label: f.label || `Campo ${allFields.indexOf(f) + 1}` }))}
+              placeholder="Campo..." label="" />
+            <Select value={field.conditional_logic?.operator ?? 'equals'}
+              onChange={(e) => onChange({ conditional_logic: { ...(field.conditional_logic ?? { field_id: 0, value: '' }), operator: e.target.value as 'equals' | 'not_equals' | 'contains' } })}
+              options={[{ value: 'equals', label: 'es igual a' }, { value: 'not_equals', label: 'no es igual a' }, { value: 'contains', label: 'contiene' }]}
+              label="" />
+            <input type="text" placeholder="Valor..."
+              value={String(field.conditional_logic?.value ?? '')}
+              onChange={(e) => onChange({ conditional_logic: { ...(field.conditional_logic ?? { field_id: 0, operator: 'equals' as const }), value: e.target.value } })}
+              className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-indigo-500" />
+          </div>
         </div>
       )}
     </div>

@@ -294,12 +294,12 @@ function AudienceRow({ entry, facultyMap, careerMap, groupMap, userMap, roleMap 
   }
 
   return (
-    <div className={`flex items-center gap-2 border rounded-lg px-4 py-2.5 text-sm ${colorClass}`}>
-      {icon}
+    <div className={`flex flex-wrap items-center gap-2 border rounded-lg px-3 py-2.5 text-sm ${colorClass}`}>
+      <span className="shrink-0">{icon}</span>
       {crumbs.map((c, i) => (
-        <span key={i} className="flex items-center gap-2">
+        <span key={i} className="flex items-center gap-1.5 min-w-0">
           {i > 0 && <ChevronRight className="size-3.5 text-gray-400 shrink-0" />}
-          <span className={c.muted ? 'text-gray-500' : 'font-medium text-gray-900'}>
+          <span className={`truncate ${c.muted ? 'text-gray-500' : 'font-medium text-gray-900'}`}>
             {c.label}
           </span>
         </span>
