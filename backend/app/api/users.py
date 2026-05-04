@@ -80,7 +80,7 @@ async def create_user(body: UserCreate, db: DB, _: CurrentAdmin):
 
 
 @router.get("/me", response_model=UserOut)
-async def get_me(db: DB, current_user: CurrentAdmin):
+async def get_me(db: DB, current_user: CurrentUser):
     result = await db.execute(
         select(User).options(
             selectinload(User.faculty), selectinload(User.career),
