@@ -66,13 +66,20 @@ REPORT_HTML = """
     {% elif section.text_rows %}
     <table>
       {% if not form.is_anonymous %}
-      <tr><th>Usuario</th><th>Nombre</th><th>Respuesta</th></tr>
+      <tr><th>Usuario</th><th>Nombre</th><th>Facultad</th><th>Carrera</th><th>Grupo</th><th>Respuesta</th></tr>
       {% else %}
       <tr><th>#</th><th>Respuesta</th></tr>
       {% endif %}
       {% for row in section.text_rows %}
       {% if not form.is_anonymous %}
-      <tr><td>{{ row.username }}</td><td>{{ row.full_name }}</td><td>{{ row.value }}</td></tr>
+      <tr>
+        <td>{{ row.username }}</td>
+        <td>{{ row.full_name }}</td>
+        <td>{{ row.faculty_name }}</td>
+        <td>{{ row.career_name }}</td>
+        <td>{{ row.group_display }}</td>
+        <td>{{ row.value }}</td>
+      </tr>
       {% else %}
       <tr><td>{{ loop.index }}</td><td>{{ row.value }}</td></tr>
       {% endif %}
@@ -185,8 +192,19 @@ def generate_pdf(
             ]
 
         elif field.type == FieldType.file:
-            section["text_rows"] = [{"username": "", "full_name": "", "value": f"Archivo adjunto"}
-                                     for _ in values]
+            if form.is_anonymous:
+                section["text_rows"] = [{"value": "Archivo adjunto"} for _ in values]
+            else:
+                for r in responses:
+                    user = users_by_response.get(r.id)
+                    section["text_rows"].append({
+                        "username": user.username if user else "",
+                        "full_name": f"{user.first_name} {user.last_name}" if user else "",
+                        "faculty_name": user.faculty.name if user and user.faculty else "",
+                        "career_name": user.career.name if user and user.career else "",
+                        "group_display": user.group.display_name if user and user.group else "",
+                        "value": "Archivo adjunto",
+                    })
 
         else:
             for r in responses:
@@ -197,6 +215,9 @@ def generate_pdf(
                 section["text_rows"].append({
                     "username": user.username if user else "",
                     "full_name": f"{user.first_name} {user.last_name}" if user else "",
+                    "faculty_name": user.faculty.name if user and user.faculty else "",
+                    "career_name": user.career.name if user and user.career else "",
+                    "group_display": user.group.display_name if user and user.group else "",
                     "value": str(val),
                 })
 
