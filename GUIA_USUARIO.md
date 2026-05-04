@@ -89,19 +89,41 @@ Tu panel muestra dos secciones:
 1. Hacer clic en el formulario que quieres responder.
 2. Leer el título y la descripción para entender el contexto.
 3. Responder cada campo:
-   - **Texto / Número / Fecha** — escribir o seleccionar el valor.
+   - **Texto corto / Número / Fecha** — escribir o seleccionar el valor directamente.
+   - **Texto largo** — campo de varias líneas para respuestas extensas.
    - **Opción única (radio)** — seleccionar una sola opción de la lista.
    - **Opción múltiple (checkbox)** — marcar todas las opciones que correspondan.
    - **Escala** — hacer clic en el número que mejor representa tu respuesta (1 al 10).
    - **Archivo** — hacer clic en el campo de carga y seleccionar el archivo desde tu dispositivo
      (tamaño máximo 10 MB).
-4. Los campos marcados con asterisco (\*) son obligatorios; no podrás enviar el formulario
+4. Los campos marcados con asterisco (**\***) son obligatorios; no podrás enviar el formulario
    sin completarlos.
 5. Hacer clic en **Enviar** cuando hayas terminado.
 
 ---
 
-### 5. Editar una Respuesta
+### 5. Campos que Aparecen Según tus Respuestas
+
+Algunos formularios incluyen preguntas que solo se muestran si respondiste algo específico
+en una pregunta anterior. Esto es completamente normal y tiene como objetivo que solo respondas
+lo que es relevante para tu situación.
+
+**Ejemplo:** Si el formulario pregunta "¿Presentas dificultades para evaluarte?" y seleccionas
+**Sí**, aparecerá a continuación un campo para que expliques tu situación. Si seleccionas
+**No**, ese campo no aparece y no es necesario que lo completes.
+
+**Puntos importantes:**
+
+- Si un campo de este tipo tiene asterisco (**\***), la obligatoriedad **solo aplica cuando
+  el campo está visible**. Si no se te mostró porque tu respuesta anterior no lo activó,
+  puedes enviar el formulario sin inconvenientes.
+- Si primero respondes de una forma que hace aparecer un campo, completas ese campo, y luego
+  cambias la respuesta anterior haciendo que el campo desaparezca, esa información no se enviará
+  al guardar el formulario.
+
+---
+
+### 6. Editar una Respuesta
 
 Si el formulario permite edición y aún está dentro del período activo:
 
@@ -112,7 +134,7 @@ Si el formulario permite edición y aún está dentro del período activo:
 
 ---
 
-### 6. Notificaciones
+### 7. Notificaciones
 
 El ícono de campana en la barra superior muestra cuántas notificaciones no leídas tienes.
 Al hacer clic se abre la lista de notificaciones recientes. Puedes marcarlas como leídas
@@ -142,3 +164,8 @@ a tu respuesta.
 **¿Puedo responder un formulario más de una vez?**
 No. El sistema solo permite una respuesta por usuario por formulario. Si el formulario es
 editable, puedes modificar tu respuesta existente.
+
+**¿Por qué aparecen y desaparecen preguntas mientras respondo?**
+Es la lógica condicional del formulario. Las preguntas que aparecen o desaparecen están
+configuradas por el administrador para mostrarse solo cuando corresponde según tus respuestas.
+Es un comportamiento esperado y no indica ningún error.
