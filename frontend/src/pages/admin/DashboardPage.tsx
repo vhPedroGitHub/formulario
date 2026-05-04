@@ -50,7 +50,7 @@ export function AdminDashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
           label="Total usuarios"
           value={stats?.total_users ?? 0}
@@ -87,11 +87,42 @@ export function AdminDashboardPage() {
       {/* Participation table */}
       {participation.length > 0 && (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b flex items-center gap-3">
+          <div className="px-4 sm:px-6 py-4 border-b flex items-center gap-3">
             <FileText className="size-5 text-gray-400" />
             <h2 className="font-semibold text-gray-900">Participación por formulario</h2>
           </div>
-          <div className="overflow-x-auto">
+
+          {/* Mobile cards */}
+          <div className="sm:hidden divide-y divide-gray-100">
+            {participation.map((p) => (
+              <div key={p.form_id} className="px-4 py-3">
+                <Link
+                  to={`/admin/forms/${p.form_id}`}
+                  className="text-indigo-600 hover:underline font-medium text-sm block mb-2 truncate"
+                >
+                  {p.form_title}
+                </Link>
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex gap-4 text-xs text-gray-500">
+                    <span><span className="font-medium text-gray-700">{p.total_audience}</span> audiencia</span>
+                    <span><span className="font-medium text-gray-700">{p.total_responses}</span> resp.</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                      <div
+                        className="bg-indigo-500 h-1.5 rounded-full"
+                        style={{ width: `${Math.min(p.participation_pct, 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-700 w-10 text-right">{p.participation_pct}%</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">

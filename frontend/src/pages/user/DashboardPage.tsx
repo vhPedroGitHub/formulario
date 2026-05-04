@@ -42,7 +42,7 @@ export function UserDashboardPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-gray-200 p-5">
           <div className="flex items-center gap-3">
             <div className="size-10 bg-indigo-100 rounded-lg flex items-center justify-center">

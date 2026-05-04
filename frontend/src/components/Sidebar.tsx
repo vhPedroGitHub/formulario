@@ -9,6 +9,7 @@ import {
   LogOut,
   BookOpen,
   ChevronRight,
+  X,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/auth'
 
@@ -24,7 +25,12 @@ const userLinks = [
   { to: '/dashboard', icon: BookOpen, label: 'Mis Formularios' },
 ]
 
-export function Sidebar() {
+interface SidebarProps {
+  open?: boolean
+  onClose?: () => void
+}
+
+export function Sidebar({ open = false, onClose }: SidebarProps) {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
   const isAdmin = user?.role === 'admin'
@@ -35,16 +41,26 @@ export function Sidebar() {
     navigate('/login')
   }
 
-  return (
-    <aside className="flex flex-col w-60 shrink-0 bg-white border-r border-gray-200 min-h-screen">
+  const SidebarContent = () => (
+    <aside className="flex flex-col w-60 bg-white border-r border-gray-200 h-full">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-gray-100">
+      <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="size-8 bg-indigo-600 rounded-lg flex items-center justify-center">
             <FileText className="size-4 text-white" />
           </div>
           <span className="text-lg font-bold text-gray-900">UniForm</span>
         </div>
+        {/* Close button — mobile only */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="md:hidden p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            aria-label="Cerrar menú"
+          >
+            <X className="size-5" />
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -54,6 +70,7 @@ export function Sidebar() {
             key={to}
             to={to}
             end={to === '/admin' || to === '/dashboard'}
+            onClick={onClose}
             className={({ isActive }) =>
               clsx(
                 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
@@ -92,5 +109,30 @@ export function Sidebar() {
         </button>
       </div>
     </aside>
+  )
+
+  return (
+    <>
+      {/* Desktop sidebar — always visible on md+ */}
+      <div className="hidden md:flex md:shrink-0 md:min-h-screen">
+        <SidebarContent />
+      </div>
+
+      {/* Mobile drawer overlay */}
+      {open && (
+        <div className="fixed inset-0 z-40 md:hidden flex">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/40 transition-opacity"
+            onClick={onClose}
+            aria-hidden="true"
+          />
+          {/* Drawer panel */}
+          <div className="relative z-50 flex min-h-full">
+            <SidebarContent />
+          </div>
+        </div>
+      )}
+    </>
   )
 }

@@ -322,7 +322,7 @@ function FormField({ field, value, onChange, onFileChange, readOnly }: FormField
       )}
 
       {field.type === 'scale' && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-gray-400">1</span>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
             <button

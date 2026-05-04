@@ -116,9 +116,9 @@ export function FormResponsesPage() {
       </button>
 
       {/* Header */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="min-w-0">
             <h1 className="text-xl font-bold text-gray-900 mb-1">{form.title}</h1>
             {form.description && <p className="text-sm text-gray-500 whitespace-pre-wrap">{form.description}</p>}
             <div className="flex flex-wrap gap-2 mt-3">
@@ -127,7 +127,7 @@ export function FormResponsesPage() {
               <Badge variant="default">{form.fields.length} campos</Badge>
               <Badge variant="default">{responses.length} respuestas</Badge>
             </div>
-            <div className="flex gap-4 mt-3 text-xs text-gray-500">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-500">
               {form.start_date && (
                 <span className="flex items-center gap-1">
                   <Calendar className="size-3" />
@@ -145,7 +145,7 @@ export function FormResponsesPage() {
               </span>
             </div>
           </div>
-          <Button onClick={handleDownloadPdf} variant="outline">
+          <Button onClick={handleDownloadPdf} variant="outline" size="sm" className="shrink-0 self-start">
             <Download className="size-4" /> Descargar PDF
           </Button>
         </div>
@@ -180,10 +180,14 @@ export function FormResponsesPage() {
       ) : (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-max">
               <thead>
                 <tr className="bg-gray-50 border-b text-xs font-medium text-gray-500 uppercase tracking-wide">
-                  {!form.is_anonymous && <th className="text-left px-5 py-3">Usuario</th>}
+                  {!form.is_anonymous && (
+                    <th className="text-left px-5 py-3 sticky left-0 bg-gray-50 z-10 shadow-[1px_0_0_0_#e5e7eb]">
+                      Usuario
+                    </th>
+                  )}
                   {form.fields.map((f) => (
                     <th key={f.id} className="text-left px-4 py-3 max-w-40">
                       <span className="truncate block">{f.label}</span>
@@ -317,7 +321,7 @@ function ResponseRow({
   return (
     <tr className="border-b last:border-0 hover:bg-gray-50 transition-colors">
       {!anonymous && (
-        <td className="px-5 py-3">
+        <td className="px-5 py-3 sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#e5e7eb]">
           <div className="flex flex-col">
             <span className="font-medium text-gray-900">
               {response.first_name} {response.last_name}

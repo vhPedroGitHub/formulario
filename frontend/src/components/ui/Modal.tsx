@@ -35,7 +35,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
     >
       <div
         className={clsx(
-          'bg-white rounded-xl shadow-xl w-full flex flex-col max-h-[90vh]',
+          'bg-white rounded-xl shadow-xl w-full flex flex-col max-h-[90vh] mx-4',
           sizes[size]
         )}
       >
