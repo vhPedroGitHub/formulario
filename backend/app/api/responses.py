@@ -99,6 +99,7 @@ async def submit_response(form_id: int, body: ResponseCreate, db: DB, current_us
         raise HTTPException(409, "Ya respondiste este formulario")
 
     # Validar campos requeridos (solo los que son visibles según lógica condicional)
+    fields_map = {f.id: f for f in form.fields}
     fields_by_order = sorted(form.fields, key=lambda f: f.order)
     answers_map = {a.field_id: a for a in body.answers}
     for field in form.fields:
