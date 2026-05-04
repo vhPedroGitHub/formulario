@@ -90,6 +90,26 @@ REPORT_HTML = """
     {% endif %}
   </div>
   {% endfor %}
+
+  <div class="page-break"></div>
+  <div class="section">
+    <h2>Estadísticas de Participantes</h2>
+    <p class="stat"><strong>Total participantes:</strong> {{ total_responses }}</p>
+    <p class="stat"><strong>Audiencia total:</strong> {{ total_audience }}</p>
+    <p class="stat"><strong>Tasa participación:</strong> {{ participation_pct }}%</p>
+    
+    {% if not form.is_anonymous and participant_details %}
+    <h3 style="margin-top:16px; color:#1e40af;">Detalle de Participantes</h3>
+    <table>
+      <tr><th>Usuario</th><th>Nombre</th><th>Facultad</th><th>Carrera</th><th>Grupo</th></tr>
+      {% for p in participant_details %}
+      <tr><td>{{ p.username }}</td><td>{{ p.full_name }}</td><td>{{ p.faculty_name }}</td><td>{{ p.career_name }}</td><td>{{ p.group_display }}</td></tr>
+      {% endfor %}
+    </table>
+    {% elif form.is_anonymous %}
+    <p style="color:#6b7280; margin-top:12px;">El formulario es anónimo, por lo que no se muestra el detalle de participantes.</p>
+    {% endif %}
+  </div>
 </body>
 </html>
 """
@@ -223,11 +243,29 @@ def generate_pdf(
 
         sections.append(section)
 
+    # Build participant details (only for non-anonymous forms)
+    participant_details = []
+    if not form.is_anonymous:
+        seen_users = set()
+        for r in responses:
+            user = users_by_response.get(r.id)
+            if user and user.id not in seen_users:
+                seen_users.add(user.id)
+                participant_details.append({
+                    "username": user.username,
+                    "full_name": f"{user.first_name} {user.last_name}",
+                    "faculty_name": user.faculty.name if user.faculty else "",
+                    "career_name": user.career.name if user.career else "",
+                    "group_display": user.group.display_name if user.group else "",
+                })
+
     tmpl = Template(REPORT_HTML)
     html_content = tmpl.render(
         form=form,
         sections=sections,
         total_responses=total_responses,
         participation_pct=participation_pct,
+        participant_details=participant_details,
+        total_audience=total_audience,
     )
     return HTML(string=html_content).write_pdf()
