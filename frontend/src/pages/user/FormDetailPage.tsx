@@ -14,10 +14,13 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import type { FormFieldOut, ConditionalLogic } from '@/types'
 
-function isFieldVisible(field: FormFieldOut, answers: Record<number, unknown>): boolean {
+function isFieldVisible(field: FormFieldOut, answers: Record<number, unknown>, allFields: FormFieldOut[]): boolean {
   if (!field.conditional_logic) return true
   const cond = field.conditional_logic as ConditionalLogic
-  const val = answers[cond.field_id]
+  // cond.field_id is the array index of the referenced field, not its DB id
+  const referencedField = allFields[cond.field_id]
+  if (!referencedField) return true
+  const val = answers[referencedField.id]
   const valStr = String(val ?? '')
   const condVal = cond.value
 
@@ -162,7 +165,7 @@ export function FormDetailPage() {
           )}
           <div className="flex flex-col gap-5">
             {form.fields
-              .filter((f) => isFieldVisible(f, answers))
+              .filter((f) => isFieldVisible(f, answers, form.fields))
               .map((field) => (
                 <FormField
                   key={field.id}
