@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, func
 from sqlalchemy.orm import selectinload
 
 from app.core.deps import DB, CurrentAdmin
@@ -9,7 +9,7 @@ from app.models.group import Group
 from app.schemas.academic import (
     FacultyCreate, FacultyUpdate, FacultyOut,
     CareerCreate, CareerUpdate, CareerOut,
-    GroupOut,
+    GroupCreate, GroupOut,
 )
 from app.services.academic import regenerate_groups
 
@@ -128,18 +128,12 @@ async def update_career(career_id: int, body: CareerUpdate, db: DB, _: CurrentAd
     if not career:
         raise HTTPException(404, "Carrera no encontrada")
 
-    needs_regen = False
     if body.name is not None:
         career.name = body.name
     if body.duration_years is not None:
         career.duration_years = body.duration_years
-        needs_regen = True
     if body.groups_per_year is not None:
         career.groups_per_year = body.groups_per_year
-        needs_regen = True
-
-    if needs_regen:
-        await regenerate_groups(db, career)
 
     await db.commit()
     await db.refresh(career)
@@ -164,6 +158,46 @@ async def delete_career(career_id: int, db: DB, _: CurrentAdmin):
 
 # ── Grupos ────────────────────────────────────────────────────────────────────
 
+@router.post("/careers/{career_id}/groups", response_model=GroupOut, status_code=status.HTTP_201_CREATED)
+async def add_group(career_id: int, body: GroupCreate, db: DB, _: CurrentAdmin):
+    result = await db.execute(select(Career).where(Career.id == career_id))
+    career = result.scalar_one_or_none()
+    if not career:
+        raise HTTPException(404, "Carrera no encontrada")
+    if body.year > career.duration_years:
+        raise HTTPException(400, f"El año {body.year} excede la duración de la carrera ({career.duration_years} años)")
+
+    max_result = await db.execute(
+        select(func.max(Group.group_number)).where(
+            Group.career_id == career_id, Group.year == body.year
+        )
+    )
+    next_number = (max_result.scalar() or 0) + 1
+
+    group = Group(career_id=career_id, year=body.year, group_number=next_number)
+    db.add(group)
+    await db.commit()
+    await db.refresh(group)
+    return GroupOut(
+        id=group.id, career_id=group.career_id, year=group.year,
+        group_number=group.group_number, display_name=group.display_name,
+    )
+
+
+@router.get("/groups", response_model=list[GroupOut])
+async def list_all_groups(db: DB):
+    result = await db.execute(
+        select(Group).order_by(Group.career_id, Group.year, Group.group_number)
+    )
+    groups = result.scalars().all()
+    return [
+        GroupOut(
+            id=g.id, career_id=g.career_id, year=g.year,
+            group_number=g.group_number, display_name=g.display_name,
+        ) for g in groups
+    ]
+
+
 @router.get("/careers/{career_id}/groups", response_model=list[GroupOut])
 async def list_groups(career_id: int, db: DB):
     result = await db.execute(
@@ -176,3 +210,13 @@ async def list_groups(career_id: int, db: DB):
             group_number=g.group_number, display_name=g.display_name,
         ) for g in groups
     ]
+
+
+@router.delete("/groups/{group_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_group(group_id: int, db: DB, _: CurrentAdmin):
+    result = await db.execute(select(Group).where(Group.id == group_id))
+    group = result.scalar_one_or_none()
+    if not group:
+        raise HTTPException(404, "Grupo no encontrado")
+    await db.delete(group)
+    await db.commit()

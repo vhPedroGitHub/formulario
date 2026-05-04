@@ -1,8 +1,14 @@
-from fastapi import FastAPI
+import logging
+
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.api import auth, users, academic, special_roles, forms, responses, notifications, dashboard, reports
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="UniForm API",
@@ -20,6 +26,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    logger.warning("Validation error [%s %s]: %s", request.method, request.url.path, errors)
+    messages = []
+    for err in errors:
+        loc_parts = [str(p) for p in err.get("loc", []) if p != "body"]
+        loc = " → ".join(loc_parts)
+        msg = err.get("msg", "valor inválido")
+        messages.append(f"{loc}: {msg}" if loc else msg)
+    detail = "; ".join(messages) if messages else "Error de validación"
+    return JSONResponse(status_code=422, content={"detail": detail})
+
 
 PREFIX = "/api"
 

@@ -20,7 +20,6 @@ class FacultyOut(BaseModel):
 
 class CareerCreate(BaseModel):
     name: str
-    faculty_id: int
     duration_years: int
     groups_per_year: int
 
@@ -48,6 +47,16 @@ class CareerOut(BaseModel):
     groups_per_year: int
     created_at: datetime
     model_config = {"from_attributes": True}
+
+
+class GroupCreate(BaseModel):
+    year: int
+
+    @model_validator(mode="after")
+    def validate_year(self) -> "GroupCreate":
+        if self.year < 1:
+            raise ValueError("El año debe ser mayor a 0")
+        return self
 
 
 class GroupOut(BaseModel):

@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 from app.core.deps import DB, CurrentAdmin
 from app.models.form import Form
 from app.models.form_response import FormResponse
+from app.models.user import User
 from app.reports.pdf_generator import generate_pdf
 from app.services.forms import get_audience_user_ids
 
@@ -27,9 +28,9 @@ async def generate_report(form_id: int, db: DB, _: CurrentAdmin):
         select(FormResponse)
         .options(
             selectinload(FormResponse.answers),
-            selectinload(FormResponse.user).selectinload("faculty"),
-            selectinload(FormResponse.user).selectinload("career"),
-            selectinload(FormResponse.user).selectinload("group"),
+            selectinload(FormResponse.user).selectinload(User.faculty),
+            selectinload(FormResponse.user).selectinload(User.career),
+            selectinload(FormResponse.user).selectinload(User.group),
         )
         .where(FormResponse.form_id == form_id)
         .order_by(FormResponse.submitted_at)

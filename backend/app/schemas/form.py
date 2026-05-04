@@ -40,7 +40,7 @@ class FormFieldIn(BaseModel):
     label: str
     help_text: Optional[str] = None
     is_required: bool = False
-    options: Optional[dict] = None
+    options: Optional[dict | list] = None
     conditional_logic: Optional[ConditionalLogic] = None
 
 
@@ -51,7 +51,7 @@ class FormFieldOut(BaseModel):
     label: str
     help_text: Optional[str] = None
     is_required: bool
-    options: Optional[dict] = None
+    options: Optional[dict | list] = None
     conditional_logic: Optional[dict] = None
     model_config = {"from_attributes": True}
 

@@ -7,6 +7,7 @@ from app.core.database import Base
 
 class FieldType(str, enum.Enum):
     text = "text"
+    textarea = "textarea"
     number = "number"
     date = "date"
     checkbox = "checkbox"

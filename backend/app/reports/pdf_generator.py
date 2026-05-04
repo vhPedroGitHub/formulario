@@ -153,7 +153,13 @@ def generate_pdf(
                     flat.append(str(v))
             counter = Counter(flat)
             total = sum(counter.values()) or 1
-            opts = (field.options or {}).get("choices", list(counter.keys()))
+            raw_opts = field.options
+            if isinstance(raw_opts, list):
+                opts = raw_opts
+            elif isinstance(raw_opts, dict):
+                opts = raw_opts.get("choices", list(counter.keys()))
+            else:
+                opts = list(counter.keys())
             labels = [str(o) for o in opts if o in counter]
             counts = [counter[o] for o in opts if o in counter]
             if counts:

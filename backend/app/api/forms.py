@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, status
-from sqlalchemy import select, func
+from sqlalchemy import select, func, delete
 from sqlalchemy.orm import selectinload
 
 from app.core.deps import DB, CurrentAdmin, CurrentUser
@@ -104,6 +104,59 @@ async def admin_get_form(form_id: int, db: DB, _: CurrentAdmin):
         raise HTTPException(404, "Formulario no encontrado")
     count_r = await db.execute(select(func.count()).where(FormResponse.form_id == form_id))
     return _build_form_out(form, count_r.scalar_one())
+
+
+@router.put("/admin/forms/{form_id}", response_model=FormOut)
+async def update_form(form_id: int, body: FormCreate, db: DB, _: CurrentAdmin):
+    result = await db.execute(
+        select(Form).where(Form.id == form_id)
+    )
+    form = result.scalar_one_or_none()
+    if not form:
+        raise HTTPException(404, "Formulario no encontrado")
+
+    # Update scalar fields in place
+    form.title = body.title
+    form.description = body.description
+    form.is_anonymous = body.is_anonymous
+    form.is_editable = body.is_editable
+    form.start_date = body.start_date
+    form.end_date = body.end_date
+
+    # Wipe existing responses (DB CASCADE removes form_answers via response_id FK)
+    await db.execute(delete(FormResponse).where(FormResponse.form_id == form_id))
+    # Wipe audience
+    await db.execute(delete(FormAudience).where(FormAudience.form_id == form_id))
+    # Wipe fields (DB CASCADE removes any remaining form_answers via field_id FK)
+    await db.execute(delete(FormField).where(FormField.form_id == form_id))
+    await db.flush()
+
+    # Recreate audience
+    for entry in body.audience:
+        db.add(FormAudience(form_id=form_id, target_type=entry.target_type, target_id=entry.target_id))
+
+    # Recreate fields
+    for idx, field_in in enumerate(body.fields):
+        cond = field_in.conditional_logic.model_dump() if field_in.conditional_logic else None
+        db.add(FormField(
+            form_id=form_id,
+            order=field_in.order if field_in.order is not None else idx,
+            type=field_in.type,
+            label=field_in.label,
+            help_text=field_in.help_text,
+            is_required=field_in.is_required,
+            options=field_in.options,
+            conditional_logic=cond,
+        ))
+
+    await db.commit()
+
+    result = await db.execute(
+        select(Form)
+        .options(selectinload(Form.audience), selectinload(Form.fields), selectinload(Form.creator))
+        .where(Form.id == form_id)
+    )
+    return _build_form_out(result.scalar_one(), 0)
 
 
 @router.delete("/admin/forms/{form_id}", status_code=status.HTTP_204_NO_CONTENT)

@@ -12,6 +12,7 @@ from app.models.form_field import FormField, FieldType
 from app.models.form_response import FormResponse
 from app.models.form_answer import FormAnswer
 from app.models.uploaded_file import UploadedFile
+from app.models.user import User
 from app.schemas.response import ResponseCreate, ResponseOut, ResponseWithUserOut, AnswerOut
 from app.services.forms import can_user_respond
 
@@ -181,9 +182,9 @@ async def admin_list_responses(form_id: int, db: DB, _: CurrentAdmin):
         select(FormResponse)
         .options(
             selectinload(FormResponse.answers),
-            selectinload(FormResponse.user).selectinload("faculty"),
-            selectinload(FormResponse.user).selectinload("career"),
-            selectinload(FormResponse.user).selectinload("group"),
+            selectinload(FormResponse.user).selectinload(User.faculty),
+            selectinload(FormResponse.user).selectinload(User.career),
+            selectinload(FormResponse.user).selectinload(User.group),
         )
         .where(FormResponse.form_id == form_id)
         .order_by(FormResponse.submitted_at)
