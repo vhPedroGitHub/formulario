@@ -89,7 +89,7 @@ export function UserDashboardPage() {
                       )}
                     </div>
                     {form.description && (
-                      <p className="text-sm text-gray-500 line-clamp-2">{form.description}</p>
+                      <p className="text-sm text-gray-500 line-clamp-2 whitespace-pre-line">{form.description}</p>
                     )}
                     <div className="flex gap-3 mt-2 text-xs text-gray-400">
                       {form.end_date && (
@@ -130,7 +130,7 @@ export function UserDashboardPage() {
                       {form.is_editable && <Badge variant="info">Editable</Badge>}
                     </div>
                     {form.description && (
-                      <p className="text-sm text-gray-400 line-clamp-1">{form.description}</p>
+                      <p className="text-sm text-gray-400 line-clamp-1 whitespace-pre-line">{form.description}</p>
                     )}
                   </div>
                   {form.is_editable && (

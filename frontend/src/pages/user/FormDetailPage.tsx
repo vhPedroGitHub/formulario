@@ -119,7 +119,7 @@ export function FormDetailPage() {
           <div>
             <h1 className="text-xl font-bold text-gray-900 mb-1">{form.title}</h1>
             {form.description && (
-              <p className="text-sm text-gray-600">{form.description}</p>
+              <p className="text-sm text-gray-600 whitespace-pre-wrap">{form.description}</p>
             )}
             <div className="flex flex-wrap gap-2 mt-3">
               {form.is_anonymous && <Badge variant="info">Anónimo</Badge>}
