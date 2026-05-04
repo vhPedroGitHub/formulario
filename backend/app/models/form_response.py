@@ -13,6 +13,7 @@ class FormResponse(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     submitted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    form_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     form: Mapped["Form"] = relationship("Form", back_populates="responses")
     user: Mapped["User"] = relationship("User", back_populates="responses")

@@ -110,7 +110,7 @@ async def submit_response(form_id: int, body: ResponseCreate, db: DB, current_us
             if not ans or ans.value is None or ans.value == "" or ans.value == []:
                 raise HTTPException(422, f"El campo '{field.label}' es requerido")
 
-    response = FormResponse(form_id=form_id, user_id=current_user.id, submitted_at=now, updated_at=now)
+    response = FormResponse(form_id=form_id, user_id=current_user.id, submitted_at=now, updated_at=now, form_version=form.version)
     db.add(response)
     await db.flush()
 
@@ -184,6 +184,7 @@ async def update_my_response(form_id: int, body: ResponseCreate, db: DB, current
         db.add(FormAnswer(response_id=response.id, field_id=ans_in.field_id, value=ans_in.value))
 
     response.updated_at = now
+    response.form_version = body.form_version if body.form_version else form.version
     await db.commit()
 
     result3 = await db.execute(

@@ -122,6 +122,7 @@ async def update_form(form_id: int, body: FormCreate, db: DB, _: CurrentAdmin):
     form.is_editable = body.is_editable
     form.start_date = body.start_date
     form.end_date = body.end_date
+    form.version += 1  # Increment version when form is edited
 
     # Wipe existing responses (DB CASCADE removes form_answers via response_id FK)
     await db.execute(delete(FormResponse).where(FormResponse.form_id == form_id))

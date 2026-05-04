@@ -78,6 +78,7 @@ class FormOut(BaseModel):
     created_at: datetime
     created_by: Optional[int] = None
     creator_username: Optional[str] = None
+    version: int = 1
     audience: list[AudienceEntryOut] = []
     fields: list[FormFieldOut] = []
     total_responses: int = 0

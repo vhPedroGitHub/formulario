@@ -85,6 +85,7 @@ export function FormDetailPage() {
         answers: Object.entries(answers)
           .filter(([k]) => visibleIds.has(Number(k)))
           .map(([k, v]) => ({ field_id: Number(k), value: v })),
+        form_version: form!.version,
       }
       if (myResponse && form?.is_editable) {
         return responsesApi.updateMine(formId, payload)
@@ -110,6 +111,7 @@ export function FormDetailPage() {
   if (!form) return <Alert variant="error">Formulario no encontrado</Alert>
 
   const hasResponded = !!myResponse
+  const formWasEdited = hasResponded && myResponse.form_version && form.version !== myResponse.form_version
   const showForm = isEditing || !hasResponded
 
   return (
@@ -156,10 +158,16 @@ export function FormDetailPage() {
 
       {/* Already responded - view mode */}
       {hasResponded && !showForm && (
-        <Alert variant="success" className="mb-4">
-          Ya respondiste este formulario.{' '}
-          {form.is_editable ? 'Puedes editar tu respuesta.' : ''}
-        </Alert>
+        formWasEdited ? (
+          <Alert variant="warning" className="mb-4">
+            El formulario fue modificado después de tu respuesta. Debes enviar una nueva respuesta.
+          </Alert>
+        ) : (
+          <Alert variant="success" className="mb-4">
+            Ya respondiste este formulario.{' '}
+            {form.is_editable ? 'Puedes editar tu respuesta.' : ''}
+          </Alert>
+        )
       )}
 
       {/* Form fields */}

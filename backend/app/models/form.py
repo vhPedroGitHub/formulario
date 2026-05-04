@@ -17,6 +17,7 @@ class Form(Base):
     start_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     end_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     creator: Mapped["User | None"] = relationship("User", foreign_keys=[created_by])
     audience: Mapped[list["FormAudience"]] = relationship("FormAudience", back_populates="form", cascade="all, delete-orphan")

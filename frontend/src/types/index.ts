@@ -151,6 +151,7 @@ export interface FormOut {
   created_at: string
   created_by: number
   creator_username?: string | null
+  version: number
   audience: AudienceEntryOut[]
   fields: FormFieldOut[]
   total_responses: number
@@ -208,6 +209,7 @@ export interface ResponseOut {
   user_id: number
   submitted_at: string
   updated_at: string
+  form_version?: number | null
   answers: AnswerOut[]
 }
 
@@ -222,6 +224,7 @@ export interface ResponseWithUserOut extends ResponseOut {
 
 export interface ResponseCreate {
   answers: AnswerOut[]
+  form_version?: number
 }
 
 // ── Notifications ─────────────────────────────────────────────────────────────

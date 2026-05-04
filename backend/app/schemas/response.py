@@ -8,14 +8,15 @@ class AnswerIn(BaseModel):
     value: Optional[Any] = None
 
 
-class ResponseCreate(BaseModel):
-    answers: list[AnswerIn]
-
-
 class AnswerOut(BaseModel):
     field_id: int
     value: Optional[Any] = None
     model_config = {"from_attributes": True}
+
+
+class ResponseCreate(BaseModel):
+    answers: list[AnswerIn]
+    form_version: Optional[int] = None
 
 
 class ResponseOut(BaseModel):
@@ -24,6 +25,7 @@ class ResponseOut(BaseModel):
     user_id: int
     submitted_at: datetime
     updated_at: datetime
+    form_version: Optional[int] = None
     answers: list[AnswerOut] = []
     model_config = {"from_attributes": True}
 
