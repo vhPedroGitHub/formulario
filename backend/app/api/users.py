@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 
-from app.core.deps import DB, CurrentAdmin
+from app.core.deps import DB, CurrentAdmin, CurrentUser
 from app.core.security import hash_password
 from app.models.user import User, UserRole
 from app.models.notification import Notification
